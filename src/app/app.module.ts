@@ -8,13 +8,17 @@ import { AppointmentListComponent } from './pages/appointment-list/appointment-l
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
+import { RegisterComponent } from './register/register.component';
+import { LoginComponent } from './login/login.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     NewAppointmentComponent,
     AppointmentListComponent,
-    DashboardComponent
+    DashboardComponent,
+    RegisterComponent,
+    LoginComponent
   ],
   imports: [
     BrowserModule,

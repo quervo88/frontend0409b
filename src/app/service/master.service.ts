@@ -6,22 +6,37 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class MasterService {
+  private apiEndPoint: string = "http://localhost:8000/api/";
 
-  apiEndPoint: string="https://freeapi.miniprojectideas.com/api/HospitalAppointment/"
+  constructor(private http: HttpClient) {}
 
-  constructor(private http: HttpClient) { }
-
-  createNew(obj:any): Observable<any>
-  {
-    return this.http.post(this.apiEndPoint + "AddNewAppointment", obj)
+  // Új foglalás létrehozása
+  createNew(obj: any): Observable<any> {
+    return this.http.post(this.apiEndPoint + "addbooking", obj);
   }
 
-  getAllAppointments ()
-  {
-    return this.http.get< Observable<any> >(this.apiEndPoint + "GetAllAppointments") 
+  // Összes foglalás lekérése
+  getAllAppointments(): Observable<any> {
+    return this.http.get(this.apiEndPoint + "bookings");
   }
-  getAllTodaysAppointments ()
-  {
-    return this.http.get< Observable<any> >(this.apiEndPoint + "GetTodaysAppointments") 
+
+  // Egy adott foglalás lekérése
+  getOneAppointment(id: number): Observable<any> {
+    return this.http.get(`${this.apiEndPoint}onebooking/${id}`);
+  }
+
+  // Foglalás frissítése
+  updateAppointment(id: number, obj: any): Observable<any> {
+    return this.http.put(`${this.apiEndPoint}updatebooking/${id}`, obj);
+  }
+
+  // Foglalás törlése
+  deleteAppointment(id: number): Observable<any> {
+    return this.http.delete(`${this.apiEndPoint}deletebooking/${id}`);
+  }
+
+  // Legutóbbi foglalás azonosító lekérése
+  getBookingId(): Observable<any> {
+    return this.http.get(this.apiEndPoint + "getbookingid");
   }
 }

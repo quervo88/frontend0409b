@@ -6,23 +6,23 @@ import { MasterService } from '../../service/master.service';
   templateUrl: './appointment-list.component.html',
   styleUrl: './appointment-list.component.css'
 })
-export class AppointmentListComponent implements OnInit {
+export class AppointmentListComponent {
 
   appointmentList: any[] =[];
 
   constructor(private master: MasterService){}
 
-  ngOnInit(): void {
-    this.getTodaysAppointments();
+  // ngOnInit(): void {
+  //   this.getTodaysAppointments();
       
-  }
+  // }
 
-  getTodaysAppointments(){
-    this.master.getAllTodaysAppointments().subscribe((res:any) =>{
-      this.appointmentList = res.data;
-    },
-    error => {
+  // getTodaysAppointments(){
+  //   this.master.getAllTodaysAppointments().subscribe((res:any) =>{
+  //     this.appointmentList = res.data;
+  //   },
+  //   error => {
 
-    })
-  }
+  //   })
+  // }
 }
