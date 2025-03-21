@@ -10,25 +10,25 @@
                                 <form class="mx-1 mx-md-4">
                                     <div class="mb-4">
                                         <label for="name" class="form-label">Name</label>
-                                        <input type="text" id="name" name="name" [(ngModel)]="registrationObj.name" class="form-control" placeholder="Enter your name" />
+                                        <input type="text" id="name" name="name" [(ngModel)]="registrationObj.name" class="form-control" placeholder="Add meg a neved!" />
                                     </div>
                                     <div class="mb-4">
                                         <label for="email" class="form-label">Email</label>
-                                        <input type="email" id="email" name="email" [(ngModel)]="registrationObj.email" class="form-control" placeholder="Enter your email" />
+                                        <input type="email" id="email" name="email" [(ngModel)]="registrationObj.email" class="form-control" placeholder="Add meg az e-mail címed!" />
                                     </div>
                                     <div class="mb-4">
                                         <label for="password" class="form-label">Jelszó</label>
                                         <input type="password" id="password" name="password" [(ngModel)]="registrationObj.password" 
                                                class="form-control" placeholder="Add meg a jelszavad!" />
                                     </div>
-                                    <!-- <div class="mb-4">
+                                    <div class="mb-4">
                                         <label for="passwordConfirmation" class="form-label">Jelszó megerősítése</label>
-                                        <input type="password" id="passwordConfirmation" name="passwordConfirmation" [(ngModel)]="registrationObj.passwordConfirmation" 
+                                        <input type="password" id="passwordConfirmation" name="passwordConfirmation" [(ngModel)]="registrationObj.confirm_password"
                                                class="form-control" placeholder="Add meg újra a jelszavad!" required />
-                                    </div> -->
+                                    </div>
                                     
                                     <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
-                                        <button type="button" (click)="onRegister()" class="btn-primary btn-lg">Register</button>
+                                        <button type="button" (click)="onRegister()" class="btn-primary btn-lg">Regisztrálok</button>
                                     </div>
                                 </form>
                             </div>

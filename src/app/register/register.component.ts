@@ -13,7 +13,7 @@ export class RegisterComponent {
     name: '',
     email: '',
     password: '',
-    // password_confirmation: ''
+    confirm_password: ''
   };
 
   constructor(private authService: AuthService, private router: Router) {}
