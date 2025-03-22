@@ -18,9 +18,11 @@ export class NewAppointmentComponent implements OnInit {
   availableTimes: string[] = [];
   user: any = null;
 
-  stylistImage: string = ''; // A változó, ami tárolja a háttérkép URL-jét
-
-  stylists: string[] = ['Sándor', 'Hajni'];
+  stylistImage: string = ''; // A kiválasztott fodrász képe
+  stylists: { name: string, value: string, image: string }[] = [
+    { name: 'Sándor', value: 'sandor', image: 'assets/img/sandor2.png' },
+    { name: 'Hajni', value: 'hajni', image: 'assets/img/hajni2.png' }
+  ];
 
   constructor(private authService: AuthService) {}
 
@@ -35,11 +37,16 @@ export class NewAppointmentComponent implements OnInit {
       this.user = JSON.parse(storedUser);
     }
 
-    // Subscribing to user$ to listen to changes
+    // Feliratkozás a felhasználó változásaira
     this.authService.user$.subscribe(user => {
       if (user) {
         this.user = user;
       }
+    });
+
+    // Ha az oldal újratöltődik, lekérdezzük a felhasználót a backendből
+    this.authService.getUser().subscribe(user => {
+      this.user = user;
     });
   }
 
@@ -76,19 +83,15 @@ export class NewAppointmentComponent implements OnInit {
   }
 
   onStylistChange() {
-    if (this.appointmentObj.stylist === 'hajni') {
-      this.stylistImage = 'assets/img/hajni2.png'; // Hajni kiválasztása
-    } else if (this.appointmentObj.stylist === 'sandor') {
-      this.stylistImage = 'assets/img/sandor2.png'; // Sándor kiválasztása
-    } else {
-      this.stylistImage = ''; // Ha egyik sem
-    }
+    const selectedStylist = this.stylists.find(s => s.value === this.appointmentObj.stylist);
+    this.stylistImage = selectedStylist ? selectedStylist.image : '';
   }
 
   onSaveAppointment() {
     if (!this.user) {
       alert('Be kell jelentkezni a foglaláshoz!');
       return;
+     
     }
 
     if (!this.appointmentObj.appointmentDate || !this.appointmentObj.appointmentTime || !this.appointmentObj.service || !this.appointmentObj.stylist) {
@@ -106,13 +109,15 @@ export class NewAppointmentComponent implements OnInit {
       appointmentTime: this.appointmentObj.appointmentTime
     };
 
-    this.authService.bookAppointment(bookingData).subscribe(
-      (res: any) => {
-        alert('Foglalás sikeresen mentve!');
-      },
-      error => {
-        alert('Hiba történt a foglalás során: ' + (error.error?.message || 'Ismeretlen hiba'));
-      }
-    );
+    console.log(bookingData)
+
+    // this.authService.bookAppointment(bookingData).subscribe(
+    //   (res: any) => {
+    //     alert('Foglalás sikeresen mentve!');
+    //   },
+    //   error => {
+    //     alert('Hiba történt a foglalás során: ' + (error.error?.message || 'Ismeretlen hiba'));
+    //   }
+    // );
   }
 }

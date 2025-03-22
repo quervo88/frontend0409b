@@ -35,11 +35,10 @@ export class AuthService {
   login(credentials: { email: string, password: string }): Observable<any> {
     return this.http.post(`${this.apiUrl}/login`, credentials).pipe(
       tap((response: any) => {
-        // Ha sikeres a bejelentkezés, tároljuk a token-t és a user adatokat
         if (response.token && response.user) {
-          localStorage.setItem('token', response.token); // A token tárolása
-          localStorage.setItem('user', JSON.stringify(response.user)); // A felhasználói adatok tárolása
-          this.userSubject.next(response.user); // Frissítjük a felhasználói adatokat
+          localStorage.setItem('token', response.token);
+          localStorage.setItem('user', JSON.stringify(response.user));
+          this.userSubject.next(response.user);
         }
       })
     );
@@ -52,12 +51,10 @@ export class AuthService {
     });
 
     return this.http.get(`${this.apiUrl}/user`, { headers }).pipe(
-      tap((user: any) => {
-        localStorage.setItem('user', JSON.stringify(user)); // Felhasználó adatok tárolása
-        this.userSubject.next(user); // Frissítjük a felhasználói adatokat
-      })
+      tap(user => this.userSubject.next(user))
     );
   }
+
 
   // Kijelentkezés metódus
   logout(): void {

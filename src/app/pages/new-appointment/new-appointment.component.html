@@ -14,8 +14,8 @@
                     </div> -->
                     <div class="mb-4">
                       <label for="email" class="form-label">Email</label>
-                      <input type="email" id="email" name="email" class="form-control" [value]="user?.email" disabled />
-                    </div>
+                      <input type="email" id="email" name="email" class="form-control" [value]="user?.email || ''" disabled />
+                  </div>
                     <div class="mb-4">
                       <label for="stylist" class="form-label">Válassz fodrászt!</label>
                       <select id="stylist" name="stylist" [(ngModel)]="appointmentObj.stylist" class="form-select">
