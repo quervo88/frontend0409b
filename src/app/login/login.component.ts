@@ -19,9 +19,9 @@ export class LoginComponent {
     this.authService.login(this.loginObj).subscribe(
       (response: any) => {
         console.log('Sikeres bejelentkezés', response);
-        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('token', response.data.token); // Mentjük a tokent
         alert('Sikeres bejelentkezés!');
-        this.router.navigate(['/dashboard']); // Átirányítás a főoldalra vagy dashboardra
+        this.router.navigate(['/new']); // Átirányítás a /new oldalra
       },
       error => {
         console.error('Hiba a bejelentkezés során', error);
@@ -30,4 +30,3 @@ export class LoginComponent {
     );
   }
 }
-

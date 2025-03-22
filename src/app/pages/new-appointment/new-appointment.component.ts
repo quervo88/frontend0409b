@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { MasterService } from '../../service/master.service';
 import { AuthService } from '../../auth.service';
 
 @Component({
@@ -9,54 +8,51 @@ import { AuthService } from '../../auth.service';
 })
 export class NewAppointmentComponent implements OnInit {
   appointmentObj: any = {
-    name: '',
-    email: '',
-    mobileNo: '',
-    city: '',
-    age: 0,
-    gender: '',
+    service: '',
     appointmentDate: '',
     appointmentTime: '',
-    isFirstVisit: true,
-    naration: ''
+    stylist: ''
   };
 
   minDate: string = '';
   availableTimes: string[] = [];
   user: any = null;
 
-  constructor(private master: MasterService, private authService: AuthService) {}
+  stylistImage: string = ''; // A változó, ami tárolja a háttérkép URL-jét
+
+  stylists: string[] = ['Sándor', 'Hajni'];
+
+  constructor(private authService: AuthService) {}
 
   ngOnInit() {
     this.setMinDate();
     this.loadUserData();
   }
 
-  // Betölti a bejelentkezett felhasználó adatait
   loadUserData() {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      this.user = JSON.parse(storedUser);
+    }
+
+    // Subscribing to user$ to listen to changes
     this.authService.user$.subscribe(user => {
       if (user) {
         this.user = user;
-        this.appointmentObj.name = user.name;
-        this.appointmentObj.email = user.email;
       }
-    }, error => {
-      console.error('Nem sikerült lekérni a felhasználói adatokat:', error);
     });
   }
 
-  // Beállítja a mai napot minimum dátumnak
   setMinDate() {
     const today = new Date();
-    this.minDate = this.formatDate(today);
+    this.minDate = today.toISOString().split('T')[0];
   }
 
-  // Frissíti az elérhető időpontokat az adott nap alapján
   updateAvailableTimes() {
     if (!this.appointmentObj.appointmentDate) return;
 
     const selectedDate = new Date(this.appointmentObj.appointmentDate);
-    const day = selectedDate.getDay(); // 0: Vasárnap, 1: Hétfő, ..., 6: Szombat
+    const day = selectedDate.getDay();
 
     if (day === 0 || day === 6) {
       this.availableTimes = [];
@@ -69,35 +65,43 @@ export class NewAppointmentComponent implements OnInit {
     let times: string[] = [];
     for (let hour = startHour; hour < endHour; hour++) {
       for (let min = 0; min < 60; min += stepMinutes) {
-        times.push(this.formatTime(hour, min));
+        times.push(`${this.padZero(hour)}:${this.padZero(min)}`);
       }
     }
     return times;
-  }
-
-  formatDate(date: Date): string {
-    return date.toISOString().split('T')[0];
-  }
-
-  formatTime(hour: number, minutes: number): string {
-    return `${this.padZero(hour)}:${this.padZero(minutes)}`;
   }
 
   padZero(num: number): string {
     return num < 10 ? `0${num}` : `${num}`;
   }
 
-  // Foglalás mentése
+  onStylistChange() {
+    if (this.appointmentObj.stylist === 'hajni') {
+      this.stylistImage = 'assets/img/hajni2.png'; // Hajni kiválasztása
+    } else if (this.appointmentObj.stylist === 'sandor') {
+      this.stylistImage = 'assets/img/sandor2.png'; // Sándor kiválasztása
+    } else {
+      this.stylistImage = ''; // Ha egyik sem
+    }
+  }
+
   onSaveAppointment() {
     if (!this.user) {
       alert('Be kell jelentkezni a foglaláshoz!');
       return;
     }
 
+    if (!this.appointmentObj.appointmentDate || !this.appointmentObj.appointmentTime || !this.appointmentObj.service || !this.appointmentObj.stylist) {
+      alert('Kérlek, töltsd ki az összes mezőt!');
+      return;
+    }
+
     const bookingData = {
       user_id: this.user.id,
-      name: this.appointmentObj.name,
-      email: this.appointmentObj.email,
+      name: this.user.name,
+      email: this.user.email,
+      service: this.appointmentObj.service,
+      stylist: this.appointmentObj.stylist,
       appointmentDate: this.appointmentObj.appointmentDate,
       appointmentTime: this.appointmentObj.appointmentTime
     };

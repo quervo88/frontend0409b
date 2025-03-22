@@ -1,5 +1,5 @@
 <nav class="navbar fixed-bottom navbar-expand-lg navbar-dark bg-dark">
-  <div class="container-fluid">
+    <div class="container-fluid">
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
           data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
           aria-label="Toggle navigation">
@@ -7,24 +7,35 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-              <li class="nav-item">
+              <!-- <li class="nav-item">
                   <a class="nav-link active" aria-current="page" routerLink="/home">
                       Dashboard</a>
+              </li> -->
+              <li class="nav-item">
+                  <a class="nav-link" routerLink="/new">Új foglalás</a>
               </li>
               <li class="nav-item">
-                  <a class="nav-link" routerLink="/new">New Appointment</a>
+                  <a class="nav-link" routerLink="/list">Foglalások</a>
               </li>
-              <li class="nav-item">
-                  <a class="nav-link" routerLink="/list"> Appointment List</a>
-              </li>
-
           </ul>
-          <form class="d-flex">
-              <button class="btn btn-outline-success" type="button">Logout</button>
-          </form>
+          <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+              <!-- Bejelentkezés gomb csak akkor jelenjen meg, ha nincs bejelentkezve -->
+              <li class="nav-item" *ngIf="!authService.isLoggedIn()">
+                  <a class="btn btn-primary nav-link" routerLink="/login" role="button">Bejelentkezés</a>
+              </li>
+              <!-- Regisztráció gomb -->
+              <li class="nav-item">
+                  <a class="btn btn-secondary nav-link" routerLink="/register" role="button">Regisztráció</a>
+              </li>
+              <!-- Kijelentkezés gomb csak akkor jelenjen meg, ha be vagy jelentkezve -->
+              <li class="nav-item" *ngIf="authService.isLoggedIn()">
+                  <button class="btn btn-outline-success" (click)="logout()" type="button">Kijelentkezés</button>
+              </li>
+          </ul>
       </div>
+    </div>
+  </nav>
+  <div class="container-fluid">
+    <router-outlet></router-outlet>
   </div>
-</nav>
-<div class="container-fluid">
-  <router-outlet></router-outlet>
-</div>
+  
