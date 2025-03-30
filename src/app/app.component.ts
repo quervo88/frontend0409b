@@ -1,18 +1,23 @@
-import { Component } from '@angular/core';
-import { AuthService } from './auth.service'; // AuthService importálása
+import { Component, OnInit } from '@angular/core';
+import { AuthService } from './auth.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css'], // javítva a styleUrls
+  styleUrls: ['./app.component.css']
 })
-export class AppComponent {
-  title = 'booking';
+export class AppComponent implements OnInit {
+  user: any = null;
 
-  constructor(public authService: AuthService) { } // AuthService injektálása
+  constructor(public authService: AuthService) {}
 
-  // Kijelentkezés metódus
-  logout(): void {
+  ngOnInit() {
+    this.authService.user$.subscribe(user => {
+      this.user = user;
+    });
+  }
+
+  logout() {
     this.authService.logout();
   }
 }

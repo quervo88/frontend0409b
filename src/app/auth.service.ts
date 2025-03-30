@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { tap, map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -50,11 +50,46 @@ export class AuthService {
       'Authorization': `Bearer ${localStorage.getItem('token')}`
     });
 
-    return this.http.get(`${this.apiUrl}/user`, { headers }).pipe(
+    return this.http.get<any>(`${this.apiUrl}/user`, { headers }).pipe(
       tap(user => this.userSubject.next(user))
     );
   }
 
+  // Felhasználók listájának lekérése
+  getUsers(): Observable<any[]> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    return this.http.get<any[]>(`${this.apiUrl}/getusers`, { headers });
+  }
+
+  setAdmin(id: number): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    return this.http.put(`${this.apiUrl}/admin/${id}`, {}, { headers });
+  }
+
+  demotivate(id: number): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    return this.http.put(`${this.apiUrl}/polymorph/${id}`, {}, { headers });
+  }
+
+  addEmployee(userId: number): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    return this.http.post(`${this.apiUrl}/add-employee/${userId}`, {}, { headers });
+  }
 
   // Kijelentkezés metódus
   logout(): void {
@@ -69,7 +104,69 @@ export class AuthService {
   }
 
   // Időpont foglalás metódus
-  bookAppointment(appointmentData: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/bookings`, appointmentData);
+  bookAppointment(bookingData: any) {
+    return this.http.post(`${this.apiUrl}/bookings`, bookingData);
   }
+
+  // Szolgáltatások listájának lekérése
+  getServices(): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+  
+    return this.http.get<any>(`${this.apiUrl}/services`, { headers });
+  }
+
+  // Szolgáltatás hozzáadása
+  addService(serviceData: { service: string, price: number }): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+  
+    return this.http.post(`${this.apiUrl}/addservice`, serviceData, { headers });
+  }
+
+  // Szolgáltatás frissítése
+  updateService(id: number, service: { service: string, price: number }): Observable<any> {
+    // Konvertáljuk a price mezőt számra, ha még nem az
+    const updatedService = {
+      service: service.service,
+      price: typeof service.price === 'string' ? parseFloat(service.price) : service.price  // Az ár biztosan szám lesz
+    };
+  
+    return this.http.put(`${this.apiUrl}/updateservice/${id}`, updatedService);
+  }
+
+  // Szolgáltatás törlése
+  deleteService(serviceId: number): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    });
+  
+    return this.http.delete(`${this.apiUrl}/deleteservice/${serviceId}`, { headers });
+  }
+
+  getEmployees(): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+  
+    return this.http.get<any>(`${this.apiUrl}/employees`, { headers });
+  }
+
+  getBookedAppointments(employeeId: number, date: string): Observable<string[]> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+  
+    return this.http.get<string[]>(`${this.apiUrl}/booked-appointments/${employeeId}/${date}`, { headers });
+  }
+  
+  
 }

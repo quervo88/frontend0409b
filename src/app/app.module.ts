@@ -11,6 +11,8 @@ import { HttpClientModule } from '@angular/common/http';
 import { RegisterComponent } from './register/register.component';
 import { LoginComponent } from './login/login.component';
 import { HomeComponent } from './home/home.component';
+import { UserlistComponent } from './userlist/userlist.component';
+import { ServicesListComponent } from './services-list/services-list.component';
 
 @NgModule({
   declarations: [
@@ -20,7 +22,9 @@ import { HomeComponent } from './home/home.component';
     DashboardComponent,
     RegisterComponent,
     LoginComponent,
-    HomeComponent
+    HomeComponent,
+    UserlistComponent,
+    ServicesListComponent
   ],
   imports: [
     BrowserModule,
