@@ -1,40 +1,50 @@
-<nav class="navbar fixed-bottom navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid">
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-            data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
-            aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link" routerLink="/new">Új foglalás</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" routerLink="/list">Foglalások</a>
-                </li>
-                <li class="nav-item" *ngIf="user?.admin === 2">
-                    <a class="nav-link" routerLink="/superadmin">Felhasználók</a>
-                </li>
-                <!-- Szolgáltatások menüpont csak Super Admin számára -->
-                <li class="nav-item" *ngIf="user?.admin === 2">
-                    <a class="nav-link" routerLink="/services">Szolgáltatások</a>
-                </li>
-            </ul>
-            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                <li class="nav-item" *ngIf="!authService.isLoggedIn()">
-                    <a class="btn btn-primary nav-link" routerLink="/login" role="button">Bejelentkezés</a>
-                </li>
-                <li class="nav-item">
-                    <a class="btn btn-secondary nav-link" routerLink="/register" role="button">Regisztráció</a>
-                </li>
-                <li class="nav-item" *ngIf="authService.isLoggedIn()">
-                    <button class="btn btn-outline-success" (click)="logout()" type="button">Kijelentkezés</button>
-                </li>
-            </ul>
-        </div>
+<!-- Felső fejléc és jobb felső sarok -->
+<div class="mainheader position-relative">
+    <h2 class="text-center mb-4">Hairdress Air</h2>
+  
+    <div class="position-absolute top-0 end-0 p-3">
+      <ng-container *ngIf="!authService.isLoggedIn(); else loggedInTemplate">
+        <a class="btn btn-outline-light" routerLink="/login">Bejelentkezés</a>
+        <a class="btn btn-outline-light" routerLink="/register">Regisztráció</a>
+      </ng-container>
+  
+      <ng-template #loggedInTemplate>
+        <span class="me-3 text-white">Üdv, {{ user?.name }}</span>
+        <button class="btn btn-outline-light" (click)="logout()">Kijelentkezés</button>
+      </ng-template>
     </div>
-</nav>
-<div class="container-fluid">
+  </div>
+  
+<!-- Navbar -->
+  <nav class="navbar fixed-bottom navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+        data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+        aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+  
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/new">Új foglalás</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/list">Foglalások</a>
+          </li>
+          <li class="nav-item" *ngIf="user?.admin === 2">
+            <a class="nav-link" routerLink="/superadmin">Felhasználók</a>
+          </li>
+          <li class="nav-item" *ngIf="user?.admin === 2">
+            <a class="nav-link" routerLink="/services">Szolgáltatások</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  
+  <!-- Tartalom -->
+  <div class="container-fluid">
     <router-outlet></router-outlet>
-</div>
+  </div>
+  

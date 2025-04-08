@@ -1,172 +1,140 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
-import { tap, map } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:8000/api'; // Az API URL-je
+  private apiUrl = 'http://localhost:8000/api';
   private userSubject = new BehaviorSubject<any>(null);
   user$ = this.userSubject.asObservable();
 
   constructor(private http: HttpClient) {
-    this.loadUserFromStorage(); // Ha van bejelentkezett felhasználó, töltsük be az adatokat!
+    this.loadUserFromStorage();
   }
 
-  // Ha van bejelentkezett felhasználó, töltsük be a localStorage-ból
   private loadUserFromStorage() {
     const token = localStorage.getItem('token');
-    if (token) {
-      const user = localStorage.getItem('user');
-      if (user) {
-        this.userSubject.next(JSON.parse(user));
-      }
+    const user = localStorage.getItem('user');
+    if (token && user) {
+      this.userSubject.next(JSON.parse(user));
     }
   }
 
-  // Regisztrációs metódus
   register(registrationData: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/register`, registrationData);
   }
 
-  // Bejelentkezés metódus
   login(credentials: { email: string, password: string }): Observable<any> {
     return this.http.post(`${this.apiUrl}/login`, credentials).pipe(
       tap((response: any) => {
         if (response.token && response.user) {
           localStorage.setItem('token', response.token);
           localStorage.setItem('user', JSON.stringify(response.user));
-          this.userSubject.next(response.user);
+          this.userSubject.next(response.user);  // Frissíti a userSubject-öt
         }
       })
     );
   }
 
-  // Felhasználó adatainak lekérése a token segítségével
   getUser(): Observable<any> {
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${localStorage.getItem('token')}`
-    });
-
+    const headers = this.getAuthHeaders();
     return this.http.get<any>(`${this.apiUrl}/user`, { headers }).pipe(
-      tap(user => this.userSubject.next(user))
+      tap(user => {
+        this.userSubject.next(user);
+        localStorage.setItem('user', JSON.stringify(user)); // Frissítés localStorage-ban
+      })
     );
   }
 
-  // Felhasználók listájának lekérése
   getUsers(): Observable<any[]> {
-    const token = localStorage.getItem('token');
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`
-    });
+    const headers = this.getAuthHeaders();
     return this.http.get<any[]>(`${this.apiUrl}/getusers`, { headers });
   }
 
   setAdmin(id: number): Observable<any> {
-    const token = localStorage.getItem('token');
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`
-    });
-
+    const headers = this.getAuthHeaders();
     return this.http.put(`${this.apiUrl}/admin/${id}`, {}, { headers });
   }
 
   demotivate(id: number): Observable<any> {
-    const token = localStorage.getItem('token');
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`
-    });
-
+    const headers = this.getAuthHeaders();
     return this.http.put(`${this.apiUrl}/polymorph/${id}`, {}, { headers });
   }
 
   addEmployee(userId: number): Observable<any> {
-    const token = localStorage.getItem('token');
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`
-    });
-
+    const headers = this.getAuthHeaders();
     return this.http.post(`${this.apiUrl}/add-employee/${userId}`, {}, { headers });
   }
 
-  // Kijelentkezés metódus
   logout(): void {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    this.userSubject.next(null); // A felhasználói adatokat töröljük
+    this.userSubject.next(null);
   }
 
-  // Ellenőrzi, hogy a felhasználó be van-e jelentkezve
   isLoggedIn(): boolean {
     return this.userSubject.getValue() !== null;
   }
 
-  // Időpont foglalás metódus
   bookAppointment(bookingData: any) {
     return this.http.post(`${this.apiUrl}/bookings`, bookingData);
   }
 
-  // Szolgáltatások listájának lekérése
   getServices(): Observable<any> {
-    const token = localStorage.getItem('token');
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`
-    });
-  
-    return this.http.get<any>(`${this.apiUrl}/services`, { headers });
+    return this.http.get(`${this.apiUrl}/services`);
   }
 
-  // Szolgáltatás hozzáadása
   addService(serviceData: { service: string, price: number }): Observable<any> {
-    const token = localStorage.getItem('token');
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`
-    });
-  
+    const headers = this.getAuthHeaders();
     return this.http.post(`${this.apiUrl}/addservice`, serviceData, { headers });
   }
 
-  // Szolgáltatás frissítése
   updateService(id: number, service: { service: string, price: number }): Observable<any> {
-    // Konvertáljuk a price mezőt számra, ha még nem az
     const updatedService = {
       service: service.service,
-      price: typeof service.price === 'string' ? parseFloat(service.price) : service.price  // Az ár biztosan szám lesz
+      price: service.price
     };
-  
-    return this.http.put(`${this.apiUrl}/updateservice/${id}`, updatedService);
+    const headers = this.getAuthHeaders(); // Ha szükséges, adj hozzá authentikációs fejléceket
+    return this.http.put(`${this.apiUrl}/updateservice/${id}`, updatedService, { headers });
   }
-
-  // Szolgáltatás törlése
-  deleteService(serviceId: number): Observable<any> {
-    const token = localStorage.getItem('token');
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    });
   
+
+  deleteService(serviceId: number): Observable<any> {
+    const headers = this.getAuthHeaders(true);
     return this.http.delete(`${this.apiUrl}/deleteservice/${serviceId}`, { headers });
   }
 
   getEmployees(): Observable<any> {
-    const token = localStorage.getItem('token');
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`
-    });
-  
+    const headers = this.getAuthHeaders();
     return this.http.get<any>(`${this.apiUrl}/employees`, { headers });
   }
 
   getBookedAppointments(employeeId: number, date: string): Observable<string[]> {
-    const token = localStorage.getItem('token');
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`
-    });
-  
+    const headers = this.getAuthHeaders();
     return this.http.get<string[]>(`${this.apiUrl}/booked-appointments/${employeeId}/${date}`, { headers });
   }
-  
-  
+
+  // Segédfüggvény az auth fejléchez
+  private getAuthHeaders(includeJson: boolean = false): HttpHeaders {
+    const token = localStorage.getItem('token') || '';
+    let headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    if (includeJson) {
+      headers = headers.set('Content-Type', 'application/json');
+    }
+
+    return headers;
+  }
+
+  getBookings(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/getbookings`, { headers: this.getAuthHeaders() });  // Az API végpont pontos megadása
+  }
+
 }
+

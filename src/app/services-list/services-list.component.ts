@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthService } from '../auth.service';  // Biztosítsuk, hogy az AuthService be van importálva
+import { AuthService } from '../auth.service';
 import { Router } from '@angular/router';
 
 @Component({
@@ -10,27 +10,24 @@ import { Router } from '@angular/router';
 export class ServicesListComponent implements OnInit {
 
   services: any[] = [];
-  newService = { name: '', price: null };  // Az új szolgáltatás tárolására szolgáló objektum
-  editingService: any = null;  // Az éppen szerkesztett szolgáltatás
+  newService = { name: '', price: null };
+  editingService: any = null;
 
   constructor(private authService: AuthService, private router: Router) {}
 
   ngOnInit(): void {
-    this.getServices();  // A szolgáltatások betöltése az oldal betöltődésekor
+    this.getServices();
   }
 
   // Szolgáltatások lekérése
   getServices(): void {
     this.authService.getServices().subscribe(
-      (response) => {
-        if (response.success) {
-          this.services = response.data;  // Beállítjuk a szolgáltatásokat
-        } else {
-          console.error('Nem sikerült a szolgáltatások betöltése');
-        }
+      (res) => {
+        console.log('Backend válasz:', res);
+        this.services = res.data || res;
       },
       (error) => {
-        console.error('Hiba történt a szolgáltatások lekérésekor:', error);
+        console.error('Hiba a szolgáltatások lekérésekor:', error);
       }
     );
   }
@@ -40,14 +37,14 @@ export class ServicesListComponent implements OnInit {
     if (this.newService.name && this.newService.price !== null) {
       const serviceData = {
         service: this.newService.name,
-        price: this.newService.price // Az ár most már számként van kezelve
+        price: this.newService.price
       };
 
       this.authService.addService(serviceData).subscribe(
         (response) => {
           if (response.success) {
-            this.services.push(response.data);  // Hozzáadjuk az új szolgáltatást
-            this.newService = { name: '', price: null };  // Kiürítjük az űrlapot
+            this.services.push(response.data);
+            this.newService = { name: '', price: null };
           } else {
             console.error('Hiba történt a szolgáltatás hozzáadásakor');
           }
@@ -63,16 +60,25 @@ export class ServicesListComponent implements OnInit {
 
   // Szolgáltatás szerkesztése
   editService(service: any): void {
-    this.editingService = { ...service };  // Átmásoljuk az aktuális szolgáltatást a szerkesztéshez
-  }
 
+
+    this.editingService = { 
+      ...service, 
+      id: service.value // A value mező értéke lesz az id
+    };
+  
+    console.log('Szerkesztésre előkészített szolgáltatás:', this.editingService);
+  }
+  
+  
+
+  // Szolgáltatás törlése
   deleteService(serviceId: number): void {
     if (confirm('Biztosan törölni szeretné ezt a szolgáltatást?')) {
       this.authService.deleteService(serviceId).subscribe(
         (response) => {
           if (response.success) {
-            // Ha sikeres a törlés, eltávolítjuk a törölt szolgáltatást a listából
-            this.services = this.services.filter(service => service.id !== serviceId);
+            this.services = this.services.filter(service => service.id !== serviceId); // Eltávolítjuk a törölt szolgáltatást
             console.log('Szolgáltatás törölve');
           } else {
             console.error('Hiba történt a szolgáltatás törlésekor');
@@ -84,38 +90,64 @@ export class ServicesListComponent implements OnInit {
       );
     }
   }
-  
 
-  // Módosított szolgáltatás mentése
-  saveEditedService(): void {
-    if (this.editingService && this.editingService.id) {
-      // Az ár konvertálása szám típusúra (ha még nem az)
-      const updatedService = {
-        service: this.editingService.service,
-        price: parseFloat(this.editingService.price) // Az ár konvertálása számra
-      };
-
-      this.authService.updateService(this.editingService.id, updatedService).subscribe(
-        (response) => {
-          if (response.success) {
-            const index = this.services.findIndex(service => service.id === this.editingService.id);
-            if (index !== -1) {
-              this.services[index] = response.data;  // Frissítjük a szolgáltatást
-            }
-            this.editingService = null;  // Kilépünk a szerkesztési módból
-          } else {
-            console.error('Hiba történt a szolgáltatás módosításakor');
-          }
-        },
-        (error) => {
-          console.error('Hiba történt a szolgáltatás módosításakor:', error);
-        }
-      );
-    }
+// Szolgáltatás módosítása
+saveEditedService(): void {
+  // Ellenőrizzük, hogy az editingService létezik, és hogy tartalmazza-e az id-t, name-t, price-t
+  if (!this.editingService) {
+    console.error('Az editingService objektum nem létezik!');
+    return;
   }
 
-  // Módosítás lemondása
+  // Ellenőrizzük az egyes mezőket
+  if (!this.editingService.id) {
+    console.error('Hiányzik az id!');
+    return;
+  }
+  if (!this.editingService.name) {
+    console.error('Hiányzik a name!');
+    return;
+  }
+  if (!this.editingService.price) {
+    console.error('Hiányzik a price!');
+    return;
+  }
+
+  console.log('Mentés előtt a szerkesztett szolgáltatás:', this.editingService);
+
+  // Az ár feldolgozása
+  let price = this.editingService.price;
+  if (typeof price === 'string') {
+    price = price.replace(/[^0-9.-]+/g, '');  // Eltávolítja a nem szám karaktereket
+  }
+
+  // Az ár konvertálása számra
+  const numericPrice = parseFloat(price);
+  
+  if (isNaN(numericPrice)) {
+    console.error('A megadott ár nem érvényes szám!');
+    return;
+  }
+
+  const updatedService = {
+    service: this.editingService.name,
+    price: numericPrice  // Ár szám formátumban
+  };
+
+  this.authService.updateService(this.editingService.id, updatedService).subscribe({
+    next: (response) => {
+      console.log('Szolgáltatás frissítve', response);
+      this.getServices();  // Újra betölti a szolgáltatásokat
+    },
+    error: (err) => {
+      console.error('Hiba történt a mentés során:', err);
+    },
+  });
+}
+
+
+  // Módosítás törlése
   cancelEdit(): void {
-    this.editingService = null;  // Kilépünk a szerkesztésből
+    this.editingService = null; // Kilépünk a szerkesztésből
   }
 }

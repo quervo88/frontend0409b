@@ -1,28 +1,30 @@
 import { Component, OnInit } from '@angular/core';
-import { MasterService } from '../../service/master.service';
+import { AuthService } from '../../auth.service';  // AuthService importálása
 
 @Component({
   selector: 'app-appointment-list',
   templateUrl: './appointment-list.component.html',
-  styleUrl: './appointment-list.component.css'
+  styleUrls: ['./appointment-list.component.css']
 })
-export class AppointmentListComponent {
+export class AppointmentListComponent implements OnInit {
+  bookings: any[] = [];  // Foglalások tárolása
 
-  appointmentList: any[] =[];
+  constructor(private authService: AuthService) { }
 
-  constructor(private master: MasterService){}
+  ngOnInit(): void {
+    this.loadBookings();  // Foglalások betöltése a komponens inicializálásakor
+  }
 
-  // ngOnInit(): void {
-  //   this.getTodaysAppointments();
-      
-  // }
-
-  // getTodaysAppointments(){
-  //   this.master.getAllTodaysAppointments().subscribe((res:any) =>{
-  //     this.appointmentList = res.data;
-  //   },
-  //   error => {
-
-  //   })
-  // }
+  loadBookings(): void {
+    this.authService.getBookings().subscribe(
+      (response) => {
+        if (response.success) {
+          this.bookings = response.data;  // A válasz adatainak eltárolása
+        }
+      },
+      (error) => {
+        console.error('Hiba történt a foglalások betöltésekor', error);
+      }
+    );
+  }
 }

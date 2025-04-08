@@ -24,7 +24,7 @@ import { ServicesListComponent } from './services-list/services-list.component';
     LoginComponent,
     HomeComponent,
     UserlistComponent,
-    ServicesListComponent
+    ServicesListComponent,
   ],
   imports: [
     BrowserModule,

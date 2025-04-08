@@ -52,6 +52,7 @@ export class NewAppointmentComponent implements OnInit {
       }
     });
   }
+  
   loadUserData() {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {

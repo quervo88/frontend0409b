@@ -1,33 +1,22 @@
-<div class="parent"></div>
-<div class="row pb-1">
-    <div class="col-12 text-end">
-        <button class="btn btn-success">All </button>
-        <button class="btn btn-primary">Todays </button>
-    </div>
-</div>
-<div class="row">
-    <div class="col-lg-3" *ngFor="let item of appointmentList">
-        <div class="card card-margin">
-            <div class="card-header no-border">
-                <h5 class="card-title">{{item.name}}</h5>
-            </div>
-            <div class="card-body pt-0">
-                <div class="widget-49">
-                    <div class="widget-49-title-wrapper">
-                        <div class="widget-49-date-primary">
-                            <span class="widget-49-date-day">{{item.appointmentNo}}</span> 
-                        </div>
-                        <div class="widget-49-meeting-info">
-                            <span class="widget-49-pro-title">{{item.city}}</span>
-                            <span class="widget-49-meeting-time">{{item.appointmentDate |date:'yy-MMM-dd'}} {{item.appointmentTime |date:'yy-MMM-dd'}}</span>
-                        </div>
-                    </div> 
-                    <div class="widget-49-meeting-action">
-                        <a href="#" class="btn btn-sm btn-success"> Done</a>
-                    </div>
-                </div>
-            </div>
+<div class="booking-list-container">
+    <div *ngIf="bookings && bookings.length > 0; else noBookings" class="row">
+      <div *ngFor="let booking of bookings" class="col-md-4 mb-4">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">{{ booking.customer_name }}</h5>
+            <p class="card-text">
+              <strong>Employee:</strong> {{ booking.employee_name }} <br>
+              <strong>Date:</strong> {{ booking.appointment_date }} <br>
+              <strong>Time:</strong> {{ booking.appointment_time }} <br>
+              <strong>Service:</strong> {{ booking.service_name || 'N/A' }}
+            </p>
+          </div>
         </div>
+      </div>
     </div>
-    
-</div>
+  
+    <ng-template #noBookings>
+      <p>No bookings available.</p>
+    </ng-template>
+  </div>
+  
