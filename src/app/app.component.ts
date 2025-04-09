@@ -7,12 +7,13 @@ import { AuthService } from './auth.service';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-  user: any = null;
+  user: any;
 
   constructor(public authService: AuthService) {}
 
   ngOnInit() {
     this.authService.user$.subscribe(user => {
+      console.log('AppComponent user változás:', user);
       this.user = user;
     });
   }

@@ -8,12 +8,17 @@ import { throwError } from 'rxjs';
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:8000/api';
-  private userSubject = new BehaviorSubject<any>(null);
+  private apiUrl = 'http://localhost:8001/api';
+  private userSubject = new BehaviorSubject<any>(this.getUserFromLocalStorage());
   user$ = this.userSubject.asObservable();
 
   constructor(private http: HttpClient) {
     this.loadUserFromStorage();
+  }
+
+  private getUserFromLocalStorage(): any {
+    const userJson = localStorage.getItem('user');
+    return userJson ? JSON.parse(userJson) : null;
   }
 
   private loadUserFromStorage() {
@@ -28,13 +33,16 @@ export class AuthService {
     return this.http.post(`${this.apiUrl}/register`, registrationData);
   }
 
-  login(credentials: { email: string, password: string }): Observable<any> {
+  login(credentials: { email: string; password: string }): Observable<any> {
     return this.http.post(`${this.apiUrl}/login`, credentials).pipe(
       tap((response: any) => {
-        if (response.token && response.user) {
-          localStorage.setItem('token', response.token);
-          localStorage.setItem('user', JSON.stringify(response.user));
-          this.userSubject.next(response.user);  // Frissíti a userSubject-öt
+        const user = response.data.user;
+        const token = response.data?.token;
+  
+        if (user && token) {
+          localStorage.setItem('token', token);
+          localStorage.setItem('user', JSON.stringify(user));
+          this.userSubject.next(user); // Ez kell, hogy frissítse az AppComponentet
         }
       })
     );

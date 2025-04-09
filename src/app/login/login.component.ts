@@ -19,13 +19,8 @@ export class LoginComponent {
     this.authService.login(this.loginObj).subscribe(
       (response: any) => {
         console.log('Sikeres bejelentkezés', response);
-        localStorage.setItem('token', response.data.token);
         alert('Sikeres bejelentkezés!');
-
-        // Itt a navigateByUrl használata biztosítja, hogy a home újra legyen töltve
-        this.router.navigateByUrl('/home').then(() => {
-          window.location.reload();  // Ezzel frissítjük az oldalt
-        });
+        this.router.navigate(['/home']);
       },
       error => {
         console.error('Hiba a bejelentkezés során', error);
@@ -33,5 +28,6 @@ export class LoginComponent {
       }
     );
   }
+  
 }
 

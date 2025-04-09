@@ -95,30 +95,7 @@ export class NewAppointmentComponent implements OnInit {
     this.minDate = today.toISOString().split('T')[0];
   }
 
-  updateAvailableTimes() {
-    if (!this.appointmentObj.appointmentDate || !this.appointmentObj.stylist) return;
-  
-    const selectedDate = new Date(this.appointmentObj.appointmentDate);
-    const day = selectedDate.getDay();
-  
-    if (day === 0 || day === 6) {
-      this.availableTimes = [];
-      return;
-    }
-  
-    let allTimes = this.generateTimeSlots(9, 17, 30);
-  
-    this.authService.getBookedAppointments(this.appointmentObj.stylist, this.appointmentObj.appointmentDate)
-      .subscribe((bookedTimes: string[]) => {
-        this.availableTimes = allTimes.filter(time => !bookedTimes.includes(time));
-        if (bookedTimes.includes(this.appointmentObj.appointmentTime)) {
-          this.appointmentObj.appointmentTime = ''; 
-        }
-      }, error => {
-        console.error("Hiba történt a foglalt időpontok lekérésekor:", error);
-        this.availableTimes = allTimes;
-      });
-  }
+
 
   generateTimeSlots(startHour: number, endHour: number, stepMinutes: number): string[] {
     let times: string[] = [];
@@ -170,5 +147,30 @@ export class NewAppointmentComponent implements OnInit {
         alert('Hiba történt a foglalás során: ' + (error.error?.message || 'Ismeretlen hiba'));
       }
     );
+  }
+
+  updateAvailableTimes() {
+    if (!this.appointmentObj.appointmentDate || !this.appointmentObj.stylist) return;
+  
+    const selectedDate = new Date(this.appointmentObj.appointmentDate);
+    const day = selectedDate.getDay();
+  
+    if (day === 0 || day === 6) {
+      this.availableTimes = [];
+      return;
+    }
+  
+    let allTimes = this.generateTimeSlots(9, 17, 30);
+  
+    this.authService.getBookedAppointments(this.appointmentObj.stylist, this.appointmentObj.appointmentDate)
+      .subscribe((bookedTimes: string[]) => {
+        this.availableTimes = allTimes.filter(time => !bookedTimes.includes(time));
+        if (bookedTimes.includes(this.appointmentObj.appointmentTime)) {
+          this.appointmentObj.appointmentTime = ''; 
+        }
+      }, error => {
+        console.error("Hiba történt a foglalt időpontok lekérésekor:", error);
+        this.availableTimes = allTimes;
+      });
   }
 }

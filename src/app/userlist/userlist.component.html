@@ -17,9 +17,9 @@
           <td>{{ user.email }}</td>
           <td>{{ user.admin === 2 ? 'Admin' : user.admin === 1 ? 'Felhasználó' : 'Nincs jogosultság' }}</td>
           <td>
-            <button *ngIf="user.admin === 0" class="btn btn-success" (click)="setAdmin(user.id)">Feljogosít</button>
-            <button *ngIf="user.admin === 1" class="btn btn-warning" (click)="demotivate(user.id)">Lefokoz</button>
-            <button class="btn btn-primary" (click)="addEmployee(user.id)">Hozzáadás dolgozókhoz</button>
+            <button *ngIf="user.admin === 0" class="btn btn-dark btn-sm" (click)="setAdmin(user.id)">Feljogosít</button>
+            <button *ngIf="user.admin === 1" class="btn btn-danger btn-sm" (click)="demotivate(user.id)">Lefokoz</button>
+            <button class="btn btn-info btn-sm" (click)="addEmployee(user.id)">Hozzáadás dolgozókhoz</button>
           </td>
         </tr>
       </tbody>
