@@ -26,3 +26,7 @@
 .form-select:disabled {
   color: #999;
 }
+
+#hal{
+  background-color: white;
+}

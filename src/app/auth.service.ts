@@ -8,7 +8,7 @@ import { throwError } from 'rxjs';
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:8001/api';
+  private apiUrl = 'http://localhost:8000/api';
   private userSubject = new BehaviorSubject<any>(this.getUserFromLocalStorage());
   user$ = this.userSubject.asObservable();
 

@@ -5,8 +5,8 @@
         <tr>
           <th>#</th>
           <th>Név</th>
-          <th>Email</th>
-          <th>Admin jogosultság</th>
+          <th>E-mail</th>
+          <th>Szerepkör</th>
           <th>Akciók</th>
         </tr>
       </thead>
@@ -15,7 +15,7 @@
           <td>{{ user.id }}</td>
           <td>{{ user.name }}</td>
           <td>{{ user.email }}</td>
-          <td>{{ user.admin === 2 ? 'Admin' : user.admin === 1 ? 'Felhasználó' : 'Nincs jogosultság' }}</td>
+          <td>{{ user.admin === 2 ? 'Superadmin' : user.admin === 1 ? 'Fodrász' : 'Vendég' }}</td>
           <td>
             <button *ngIf="user.admin === 0" class="btn btn-dark btn-sm" (click)="setAdmin(user.id)">Feljogosít</button>
             <button *ngIf="user.admin === 1" class="btn btn-danger btn-sm" (click)="demotivate(user.id)">Lefokoz</button>
